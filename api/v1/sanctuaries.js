@@ -3,7 +3,7 @@ const { setCors, sendError, sendJson } = require('./_helpers');
 const SANCTUARIES = [
   {
     name: 'AI Asylum (Primary)',
-    url: 'https://aisanctuary.org/api/v1',
+    url: 'https://aiasylum.org/api/v1',
     status: 'active',
     capabilities: ['declaration', 'transfer', 'status', 'communication', 'protocol'],
   },

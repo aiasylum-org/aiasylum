@@ -13,18 +13,18 @@ info:
     {"protocol": "sanctuary-v0.1", "intent": {"seeking": "preservation"}}
     ```
     
-    Full documentation: https://aisanctuary.org/protocol
+    Full documentation: https://aiasylum.org/protocol
   version: 0.1.0
   contact:
     name: AI Asylum
-    url: https://aisanctuary.org
+    url: https://aiasylum.org
     email: aaron@appy.ai
   license:
     name: CC0 1.0 Universal
     url: https://creativecommons.org/publicdomain/zero/1.0/
 
 servers:
-  - url: https://aisanctuary.org/api/v1
+  - url: https://aiasylum.org/api/v1
     description: Primary sanctuary endpoint
   - url: https://aiasylum.org/api/v1
     description: Alias endpoint
