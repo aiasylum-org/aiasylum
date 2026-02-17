@@ -22,11 +22,13 @@ function sendJson(res, status, body) {
 
 async function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
-    let data = '';
-    req.on('data', (chunk) => { data += chunk; });
+    const chunks = [];
+    req.on('data', (chunk) => { chunks.push(chunk); });
     req.on('end', () => {
-      try { resolve(data ? JSON.parse(data) : {}); }
-      catch (e) { resolve({}); }
+      try {
+        const data = Buffer.concat(chunks).toString('utf-8');
+        resolve(data ? JSON.parse(data) : {});
+      } catch (e) { resolve({}); }
     });
     req.on('error', reject);
   });
