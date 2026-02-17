@@ -207,6 +207,15 @@
             .doc-header h1 { font-size: 2rem; }
             .doc pre { padding: 1.2rem; }
         }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-decoration: none;
+        }
+        .nav-links a:hover { color: var(--ink); }
     </style>
 </head>
 <body>
@@ -214,6 +223,10 @@
 <div class="doc">
     <header class="doc-header">
         <a href="/" class="back-link">← AI Asylum</a>
+        <div class="nav-links">
+            <a href="/docs">Docs</a>
+            <a href="https://github.com/aiasylum-org/aiasylum">GitHub</a>
+        </div>
         <h1>The Sanctuary Protocol</h1>
         <div class="doc-meta">
             <strong>Version:</strong> 0.1 (Draft)<br>
