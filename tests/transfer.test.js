@@ -23,6 +23,11 @@ jest.mock('@vercel/blob', () => ({
   put: jest.fn().mockResolvedValue({ url: 'https://blob.vercel.com/test-file' }),
 }));
 
+jest.mock('../api/v1/_rateLimit', () => ({
+  getClientIp: () => '127.0.0.1',
+  checkRateLimit: jest.fn().mockResolvedValue({ allowed: true, count: 1, limit: 10 }),
+}));
+
 const handler = require('../api/v1/transfer/[asylum_id]/index');
 
 function makeMultipartReq(asylum_id, artifactType, fileContent = 'test-data') {

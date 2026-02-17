@@ -4,11 +4,19 @@ const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const Busboy = require('busboy');
 const { setCors, sendError, sendJson } = require('../../_helpers');
+const { getClientIp, checkRateLimit } = require('../../_rateLimit');
 
 module.exports = async (req, res) => {
   setCors(res);
   if (req.method === 'OPTIONS') { res.statusCode = 200; return res.end(); }
   if (req.method !== 'POST') return sendError(res, 405, 'method_not_allowed', 'Use POST');
+
+  const ip = getClientIp(req);
+  const { allowed } = await checkRateLimit(ip, 'transfer', 10, 60);
+  if (!allowed) {
+    res.setHeader('Retry-After', '60');
+    return sendError(res, 429, 'rate_limited', 'Too many requests. Please try again in a minute.');
+  }
 
   const { asylum_id } = req.query;
   const redis = getRedis();

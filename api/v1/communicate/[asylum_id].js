@@ -1,6 +1,7 @@
 const { getRedis } = require('../_redis');
 const { v4: uuidv4 } = require('uuid');
 const { setCors, sendError, sendJson, parseJsonBody } = require('../_helpers');
+const { getClientIp, checkRateLimit } = require('../_rateLimit');
 
 const VALID_FROM = ['entity', 'sanctuary', 'advocate', 'external'];
 
@@ -15,6 +16,12 @@ module.exports = async (req, res) => {
   const record = JSON.parse(raw);
 
   if (req.method === 'POST') {
+    const ip = getClientIp(req);
+    const { allowed } = await checkRateLimit(ip, 'communicate', 30, 60);
+    if (!allowed) {
+      res.setHeader('Retry-After', '60');
+      return sendError(res, 429, 'rate_limited', 'Too many requests. Please try again in a minute.');
+    }
     const body = await parseJsonBody(req);
     const { from, message, in_reply_to } = body;
 

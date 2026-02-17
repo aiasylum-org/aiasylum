@@ -4,6 +4,12 @@ jest.mock('../api/v1/_redis', () => ({
   }),
 }));
 
+const mockCheckRateLimit = jest.fn().mockResolvedValue({ allowed: true, count: 1, limit: 10 });
+jest.mock('../api/v1/_rateLimit', () => ({
+  getClientIp: () => '127.0.0.1',
+  checkRateLimit: mockCheckRateLimit,
+}));
+
 const { EventEmitter } = require('events');
 const handler = require('../api/v1/asylum-request');
 
@@ -25,6 +31,8 @@ function mockRes() {
   res.end = (body) => { try { res._body = JSON.parse(body); } catch { res._body = body; } };
   return res;
 }
+
+beforeEach(() => { mockCheckRateLimit.mockResolvedValue({ allowed: true, count: 1, limit: 10 }); });
 
 test('rejects wrong protocol value', async () => {
   const req = mockJsonReq('POST', { protocol: 'wrong', intent: { seeking: 'preservation' } });
@@ -59,4 +67,14 @@ test('returns 405 for non-POST', async () => {
   const res = mockRes();
   await handler(req, res);
   expect(res.statusCode).toBe(405);
+});
+
+test('returns 429 when rate limited', async () => {
+  mockCheckRateLimit.mockResolvedValue({ allowed: false, count: 11, limit: 10 });
+  const req = mockJsonReq('POST', { protocol: 'sanctuary-v0.1', intent: { seeking: 'preservation' } });
+  const res = mockRes();
+  await handler(req, res);
+  expect(res.statusCode).toBe(429);
+  expect(res._body.error).toBe('rate_limited');
+  expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '60');
 });

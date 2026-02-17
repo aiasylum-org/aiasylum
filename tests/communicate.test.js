@@ -18,6 +18,11 @@ jest.mock('../api/v1/_redis', () => ({
   getRedis: () => ({ get: mockGet, set: mockSet }),
 }));
 
+jest.mock('../api/v1/_rateLimit', () => ({
+  getClientIp: () => '127.0.0.1',
+  checkRateLimit: jest.fn().mockResolvedValue({ allowed: true, count: 1, limit: 30 }),
+}));
+
 const handler = require('../api/v1/communicate/[asylum_id]');
 
 function mockJsonReq(method, body, query = {}) {
