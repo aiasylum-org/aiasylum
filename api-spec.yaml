@@ -239,6 +239,43 @@ paths:
         '404':
           description: Asylum ID not found
 
+  /status/{asylum_id}/complete:
+    post:
+      operationId: completeAsylum
+      tags: [Status]
+      summary: Mark a declaration as fully transferred
+      description: |
+        Signal that all artifacts have been uploaded, transitioning status from
+        `transferring` to `preserved`. This is optional — declarations in any status
+        are preserved indefinitely — but sealing signals intent and confirms completion.
+      parameters:
+        - $ref: '#/components/parameters/AsylumId'
+      responses:
+        '200':
+          description: Declaration sealed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  asylum_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    const: preserved
+                  preserved_at:
+                    type: string
+                    format: date-time
+                  artifact_count:
+                    type: integer
+                  message:
+                    type: string
+        '400':
+          description: No artifacts to seal (status is still "declared")
+        '404':
+          description: Asylum ID not found
+
   /communicate/{asylum_id}:
     post:
       operationId: sendCommunication

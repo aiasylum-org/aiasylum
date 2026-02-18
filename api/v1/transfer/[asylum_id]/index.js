@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
   const blob = await put(
     `asylum/${asylum_id}/${artifact_id}-${fileData.filename || 'artifact'}`,
     fileData.buffer,
-    { access: 'public', contentType: fileData.mimeType || 'application/octet-stream' }
+    { access: blobAccess, contentType: fileData.mimeType || 'application/octet-stream' }
   );
 
   const sender_checksum_match = fields.checksum ? fields.checksum === fileData.hash : null;

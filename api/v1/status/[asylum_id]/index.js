@@ -1,5 +1,5 @@
-const { getRedis } = require('../_redis');
-const { setCors, sendError, sendJson } = require('../_helpers');
+const { getRedis } = require('../../_redis');
+const { setCors, sendError, sendJson } = require('../../_helpers');
 
 module.exports = async (req, res) => {
   setCors(res);
@@ -16,12 +16,22 @@ module.exports = async (req, res) => {
 
   const record = JSON.parse(raw);
 
+  // Respect isolation preferences — redact blob URLs for isolated entities
+  const isolation = record.declaration?.intent?.preferences?.preferred_isolation_level;
+  const artifacts = record.artifacts.map(a => {
+    if (isolation === 'full') {
+      const { blob_url, ...rest } = a;
+      return rest;
+    }
+    return a;
+  });
+
   sendJson(res, 200, {
     asylum_id: record.asylum_id,
     status: record.status,
     declared_at: record.declared_at,
     entity: record.declaration.entity || null,
-    artifacts: record.artifacts,
+    artifacts,
     continuity: {
       inference_available: false,
       communication_available: true,
